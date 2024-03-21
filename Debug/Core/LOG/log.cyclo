@@ -1,0 +1,2 @@
+../Core/LOG/log.c:28:6:log_print	1
+../Core/LOG/log.c:39:6:log_print_from_Queue	1
