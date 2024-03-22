@@ -1,2 +1,5 @@
-../Core/LOG/log.c:28:6:log_print	1
-../Core/LOG/log.c:39:6:log_print_from_Queue	1
+../Core/LOG/log.c:30:6:log_print	1
+../Core/LOG/log.c:41:6:log_print_from_Queue	1
+../Core/LOG/log.c:61:10:get_set_log_pool_id	2
+../Core/LOG/log.c:69:14:get_set_log_queue_id	2
+../Core/LOG/log.c:78:10:log_Queue_put	1

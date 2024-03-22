@@ -18,7 +18,7 @@ status_t bsp_print_log(log_message_t * message){
 	return result == HAL_OK ? BSP_OK : BSP_ERROR;
 }
 
-osThreadId mem_log_thread_id(osThreadId thread_id){
+osThreadId get_set_mem_log_thread_id(osThreadId thread_id){
 	static osThreadId log_osThreadId;
 	if (thread_id != NULL) {
 		log_osThreadId = thread_id;
@@ -28,7 +28,7 @@ osThreadId mem_log_thread_id(osThreadId thread_id){
 
 void HAL_UART_TxCpltCallback (UART_HandleTypeDef * huart){
 	if (huart->Instance == huart1.Instance){
-		osSignalSet(mem_log_thread_id(NULL), 0x00000001);
+		osSignalSet(get_set_mem_log_thread_id(NULL), 0x00000001);
 	}
 };
 

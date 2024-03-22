@@ -42,7 +42,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 osPoolDef (LogMem, 8, log_message_t);
-osPoolId  LogMem;
+osPoolId  LogMemHandle;
 osMessageQDef(LogQueue, 8, uint8_t);
 osMessageQId  LogQueue;
 /* USER CODE END PM */
@@ -134,7 +134,15 @@ void MX_FREERTOS_Init(void) {
   UARTRightTaskHandle = osThreadCreate(osThread(UARTRightTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  mem_log_thread_id(LogTaskHandle);
+  LogMemHandle = osPoolCreate(osPool(LogMem));
+//	if (LogMemHandle != NULL){
+//		log_print(LOG_INFO, "POOL INIT");
+//	} else {
+//		log_print(LOG_ERROR, "POOL DOES NOT INIT");
+//	}
+  get_set_mem_log_thread_id(LogTaskHandle);
+  get_set_log_pool_id(LogMemHandle);
+  get_set_log_queue_id(LogQueueHandle);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
@@ -153,7 +161,9 @@ void StartDispacherTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osDelay(2000);
+//    log_print(LOG_INFO, "Dispather task");
+    log_Queue_put(LOG_INFO, (uint8_t *)"It is work");
   }
   /* USER CODE END StartDispacherTask */
 }
@@ -170,22 +180,26 @@ void StartLogTask(void const * argument)
   /* USER CODE BEGIN StartLogTask */
 	osEvent  evt1;
 	osEvent  evt2;
-	LogMem = osPoolCreate(osPool(LogMem));
 
-	evt2 = osSignalWait (0x00000001, 0x00000FFF);
-	if ((LogMem != NULL) && (evt2.status == osEventSignal)){
-		log_print(LOG_INFO, "POOL INIT");
-	} else {
-		log_print(LOG_ERROR, "POOL DOES NOT INIT");
-	}
 
+//	evt2 = osSignalWait (0x00000001, 0x00000FFF);
+//    if (evt2.status == osEventSignal){
+//    	log_print(LOG_INFO, "Like this");
+//    	//log_print_from_Queue(LogMem, evt1.value.p);
+//    }
   /* Infinite loop */
   for(;;)
   {
-	evt1 = osMessageGet(LogQueue, osWaitForever);
-	evt2 = osSignalWait (0x00000001, 0x00000FFF);
-    if ((evt1.status == osEventMessage) && (evt2.status == osEventSignal) ) {
-    	log_print_from_Queue(LogMem, evt1.value.p);
+	evt1 = osMessageGet(LogQueueHandle, osWaitForever);
+	osDelay(200);
+    if (evt1.status == osEventMessage) {
+    	log_print_from_Queue(evt1.value.p);
+    }
+    //log_print(LOG_INFO, "Here1");
+    evt2 = osSignalWait (0x00000001, osWaitForever);
+    //log_print(LOG_INFO, "Here2");
+    if(evt2.status == osEventSignal){
+    	osPoolFree(LogMemHandle, evt1.value.p);
     }
   }
   /* USER CODE END StartLogTask */

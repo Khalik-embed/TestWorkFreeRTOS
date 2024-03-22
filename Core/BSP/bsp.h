@@ -22,7 +22,7 @@ typedef enum {
 
 typedef struct {
     int size;
-    const uint8_t * message;
+    uint8_t message[MAX_LOG_INFO_WIDTH];
 } log_message_t;
 
 #endif /* BSP_BSP_H_ */
