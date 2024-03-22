@@ -19,7 +19,7 @@ typedef enum {
 
 #define MAX_LOG_INFO_WIDTH  128
 #define LOG_LEVEL LOG_INFO
-
+#define LOG_SIGNAL 0x00000001
 typedef struct {
     int size;
     uint8_t message[MAX_LOG_INFO_WIDTH];

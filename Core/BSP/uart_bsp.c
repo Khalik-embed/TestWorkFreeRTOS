@@ -28,15 +28,8 @@ osThreadId get_set_mem_log_thread_id(osThreadId thread_id){
 
 void HAL_UART_TxCpltCallback (UART_HandleTypeDef * huart){
 	if (huart->Instance == huart1.Instance){
-		osSignalSet(get_set_mem_log_thread_id(NULL), 0x00000001);
+		osSignalSet(get_set_mem_log_thread_id(NULL), LOG_SIGNAL);
 	}
 };
 
-//void HAL_UART_TxCpltCallback (&huart){
-//	if (huart->Instance == huart1.Instance){
-//		osSignalSet(mem_log_thread_id(NULL), 0x00000001);
-//	}
-//};
 
-
-//status_t bsp_get_data

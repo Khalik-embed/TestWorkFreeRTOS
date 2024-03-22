@@ -15,8 +15,6 @@
 #include "log.h"
 #include "time_bsp.h"
 
-uint8_t test_string[128]; //////////
-uint8_t test_string2[128]; //////////
 static char * log_level_string[]= {
 	"LOG_INFO",
 	"LOG_WARNING",
@@ -39,25 +37,9 @@ void log_print(LogLevel_t log_level, const char* message){
 }
 
 void log_print_from_Queue(log_message_t * log_message){
-	sprintf(test_string2, "get= %p, %d, \n", log_message,
-			log_message->size, log_message->message[0]);
-	log_print(LOG_INFO, test_string2);
-	//bsp_print_log((log_message_t *)log_message);
+	bsp_print_log((log_message_t *)log_message);
 }
 
-//void AlocMemoryPoolBlockLog (void)  {
-//  osPoolId   MemPool_Id;
-//  log_message_t *addr;
-//
-//  if (MemPool_Id != NULL)  {
-//    addr = (log_message_t *)osPoolAlloc (MemPool_Id);
-//
-//    if (addr != NULL) {
-//    	log_mem_pool_id(addr);
-//    }
-//  }
-//}
-//
 osPoolId get_set_log_pool_id(osPoolId pool_id_new){
 	static osPoolId pool_id = NULL;
 	if (pool_id_new != NULL){
@@ -85,9 +67,6 @@ uint32_t log_Queue_put(LogLevel_t log_level, const uint8_t * message){
 	         (unsigned int)time_stamp,
 			 log_level_string[log_level], message);
 		message_item_ptr->size = strlen((char *)message_item_ptr->message);
-		sprintf(test_string, "put= %p, %d, %c\n", message_item_ptr,
-				message_item_ptr->size, message_item_ptr->message[0]);
-		log_print(LOG_INFO, test_string);
 		result = (uint32_t)osMessagePut(get_set_log_queue_id(NULL), (uint32_t)message_item_ptr, osWaitForever);
 	}
 	return result;

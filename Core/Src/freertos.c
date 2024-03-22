@@ -109,7 +109,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the queue(s) */
   /* definition and creation of LogQueue */
-
+  osMessageQDef(LogQueue, 8, uint32_t);
   LogQueueHandle = osMessageCreate(osMessageQ(LogQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -135,11 +135,6 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   LogMemHandle = osPoolCreate(osPool(LogMem));
-//	if (LogMemHandle != NULL){
-//		log_print(LOG_INFO, "POOL INIT");
-//	} else {
-//		log_print(LOG_ERROR, "POOL DOES NOT INIT");
-//	}
   get_set_mem_log_thread_id(LogTaskHandle);
   get_set_log_pool_id(LogMemHandle);
   get_set_log_queue_id(LogQueueHandle);
@@ -162,7 +157,6 @@ void StartDispacherTask(void const * argument)
   for(;;)
   {
     osDelay(2000);
-//    log_print(LOG_INFO, "Dispather task");
     log_Queue_put(LOG_INFO, (uint8_t *)"It is work");
   }
   /* USER CODE END StartDispacherTask */
@@ -181,23 +175,14 @@ void StartLogTask(void const * argument)
 	osEvent  evt1;
 	osEvent  evt2;
 
-
-//	evt2 = osSignalWait (0x00000001, 0x00000FFF);
-//    if (evt2.status == osEventSignal){
-//    	log_print(LOG_INFO, "Like this");
-//    	//log_print_from_Queue(LogMem, evt1.value.p);
-//    }
   /* Infinite loop */
   for(;;)
   {
 	evt1 = osMessageGet(LogQueueHandle, osWaitForever);
-	osDelay(200);
     if (evt1.status == osEventMessage) {
     	log_print_from_Queue(evt1.value.p);
     }
-    //log_print(LOG_INFO, "Here1");
-    evt2 = osSignalWait (0x00000001, osWaitForever);
-    //log_print(LOG_INFO, "Here2");
+    evt2 = osSignalWait (LOG_SIGNAL, osWaitForever);
     if(evt2.status == osEventSignal){
     	osPoolFree(LogMemHandle, evt1.value.p);
     }
