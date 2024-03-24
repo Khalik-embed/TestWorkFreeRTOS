@@ -1,0 +1,6 @@
+../Core/Middleware/set_get.c:10:12:get_set_mem_log_thread_id	2
+../Core/Middleware/set_get.c:18:12:get_set_dispatcher_queue_id	2
+../Core/Middleware/set_get.c:26:12:get_set_uart_left_queue_id	2
+../Core/Middleware/set_get.c:34:12:get_set_uart_right_queue_id	2
+../Core/Middleware/set_get.c:42:10:get_set_log_pool_id	2
+../Core/Middleware/set_get.c:50:14:get_set_log_queue_id	2

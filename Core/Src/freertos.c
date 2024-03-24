@@ -25,6 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "parser.h"
+#include "set_get.h"
 #include "log.h"
 #include "bsp.h"
 /* USER CODE END Includes */
@@ -56,6 +58,9 @@ osThreadId LogTaskHandle;
 osThreadId UARTLeftTaskHandle;
 osThreadId UARTRightTaskHandle;
 osMessageQId LogQueueHandle;
+osMessageQId UartLeftHandle;
+osMessageQId UartRightHandle;
+osMessageQId DispQueueHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -112,6 +117,18 @@ void MX_FREERTOS_Init(void) {
   osMessageQDef(LogQueue, 8, uint32_t);
   LogQueueHandle = osMessageCreate(osMessageQ(LogQueue), NULL);
 
+  /* definition and creation of UartLeft */
+  osMessageQDef(UartLeft, 128, uint8_t);
+  UartLeftHandle = osMessageCreate(osMessageQ(UartLeft), NULL);
+
+  /* definition and creation of UartRight */
+  osMessageQDef(UartRight, 128, uint8_t);
+  UartRightHandle = osMessageCreate(osMessageQ(UartRight), NULL);
+
+  /* definition and creation of DispQueue */
+  osMessageQDef(DispQueue, 128, uint8_t);
+  DispQueueHandle = osMessageCreate(osMessageQ(DispQueue), NULL);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
@@ -135,9 +152,14 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   LogMemHandle = osPoolCreate(osPool(LogMem));
-  get_set_mem_log_thread_id(LogTaskHandle);
   get_set_log_pool_id(LogMemHandle);
   get_set_log_queue_id(LogQueueHandle);
+  get_set_dispatcher_queue_id(DispQueueHandle);
+  get_set_uart_left_queue_id(UartLeftHandle);
+  get_set_uart_right_queue_id(UartRightHandle);
+
+  get_set_mem_log_thread_id(LogTaskHandle);
+
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
@@ -153,11 +175,21 @@ void MX_FREERTOS_Init(void) {
 void StartDispacherTask(void const * argument)
 {
   /* USER CODE BEGIN StartDispacherTask */
+	osEvent  queue_evt;
+	init_isr_uarts();
+	log_Queue_put(LOG_INFO, (uint8_t *)" ");
+	log_Queue_put(LOG_INFO, (uint8_t *)"Start work, you can send:");
+	log_Queue_put(LOG_INFO, (uint8_t *)"LEFT SEND:\"SOME_DATA\"");
+	log_Queue_put(LOG_INFO, (uint8_t *)"RIGHT SEND:\"SOME_DATA\"");
   /* Infinite loop */
   for(;;)
   {
-    osDelay(2000);
-    log_Queue_put(LOG_INFO, (uint8_t *)"It is work");
+	queue_evt = osMessageGet(DispQueueHandle, osWaitForever);
+	//start_isr_uart_disp();
+	if (queue_evt.status == osEventMessage){
+		command_parser((uint8_t)queue_evt.value.p);
+	}
+	osThreadYield();
   }
   /* USER CODE END StartDispacherTask */
 }
@@ -172,19 +204,19 @@ void StartDispacherTask(void const * argument)
 void StartLogTask(void const * argument)
 {
   /* USER CODE BEGIN StartLogTask */
-	osEvent  evt1;
-	osEvent  evt2;
+	osEvent  queue_evt;
+	osEvent  signal_evt;
 
   /* Infinite loop */
   for(;;)
   {
-	evt1 = osMessageGet(LogQueueHandle, osWaitForever);
-    if (evt1.status == osEventMessage) {
-    	log_print_from_Queue(evt1.value.p);
+	  queue_evt = osMessageGet(LogQueueHandle, osWaitForever);
+    if (queue_evt.status == osEventMessage) {
+    	log_print_from_Queue(queue_evt.value.p);
     }
-    evt2 = osSignalWait (LOG_SIGNAL, osWaitForever);
-    if(evt2.status == osEventSignal){
-    	osPoolFree(LogMemHandle, evt1.value.p);
+    signal_evt = osSignalWait (LOG_SIGNAL_TX, osWaitForever);
+    if(signal_evt.status == osEventSignal){
+    	osPoolFree(LogMemHandle, queue_evt.value.p);
     }
   }
   /* USER CODE END StartLogTask */
@@ -200,10 +232,17 @@ void StartLogTask(void const * argument)
 void StartUARTLeftTask(void const * argument)
 {
   /* USER CODE BEGIN StartUARTLeftTask */
+	osEvent  queue_evt;
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	 queue_evt = osMessageGet(UartLeftHandle, osWaitForever);
+	 if (queue_evt.status == osEventMessage){
+		 bsp_transmit_uart_right((uint8_t)queue_evt.value.p);
+		 log_Queue_put(LOG_INFO, (uint8_t *)"GET DATA LEFT");
+	  }
+	 osSignalWait (UART_RIGHT_SIGNAL_TX, osWaitForever); // wait until send
+
   }
   /* USER CODE END StartUARTLeftTask */
 }
@@ -218,10 +257,18 @@ void StartUARTLeftTask(void const * argument)
 void StartUARTRightTask(void const * argument)
 {
   /* USER CODE BEGIN StartUARTRightTask */
+	static uint8_t test_str[50];
+	osEvent  queue_evt;
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  queue_evt = osMessageGet(UartRightHandle, osWaitForever);
+	  if (queue_evt.status == osEventMessage){
+		  	  bsp_transmit_uart_left((uint8_t)queue_evt.value.p);
+		  	  //sprintf()
+		  	  log_Queue_put(LOG_INFO, (uint8_t *)"GET DATA RIGHT");
+		  }
+	  osSignalWait (UART_LEFT_SIGNAL_TX, osWaitForever); // wait until send
   }
   /* USER CODE END StartUARTRightTask */
 }

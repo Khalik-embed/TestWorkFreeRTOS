@@ -12,8 +12,16 @@
 
 #include "bsp.h"
 
-status_t bsp_print_log(log_message_t * message);
-osThreadId get_set_mem_log_thread_id(osThreadId thread_id);
+#define AMOUNT_OF_BYTES_FOR_ISR_UART_DISP_LOG 1
+#define AMOUNT_OF_BYTES_FOR_ISR_UART_UART_LEFT 1
+#define AMOUNT_OF_BYTES_FOR_ISR_UART_UART_RIGHT 1
 
+status_t bsp_print_log(log_message_t * message);
+status_t bsp_transmit_uart_right(uint8_t data_byte);
+status_t bsp_transmit_uart_left(uint8_t data_byte);
+void init_isr_uarts(void);
+void start_isr_uart_disp(void);
+void start_isr_uart_left(void);
+void start_isr_uart_right(void);
 
 #endif /* BSP_UART_BSP_H_ */

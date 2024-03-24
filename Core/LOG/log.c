@@ -12,6 +12,7 @@
 
 #include "cmsis_os.h"
 
+#include "set_get.h"
 #include "log.h"
 #include "time_bsp.h"
 
@@ -38,22 +39,6 @@ void log_print(LogLevel_t log_level, const char* message){
 
 void log_print_from_Queue(log_message_t * log_message){
 	bsp_print_log((log_message_t *)log_message);
-}
-
-osPoolId get_set_log_pool_id(osPoolId pool_id_new){
-	static osPoolId pool_id = NULL;
-	if (pool_id_new != NULL){
-		pool_id = pool_id_new;
-	}
-	return pool_id;
-}
-
-osMessageQId get_set_log_queue_id(osMessageQId queue_id_new){
-	static osPoolId queue_id = NULL;
-	if (queue_id_new != NULL){
-		queue_id = queue_id_new;
-	}
-	return queue_id;
 }
 
 
