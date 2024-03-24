@@ -58,8 +58,8 @@ osThreadId LogTaskHandle;
 osThreadId UARTLeftTaskHandle;
 osThreadId UARTRightTaskHandle;
 osMessageQId LogQueueHandle;
-osMessageQId UartLeftHandle;
-osMessageQId UartRightHandle;
+osMessageQId UartLeftQueueHandle;
+osMessageQId UartRightQueueHandle;
 osMessageQId DispQueueHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -117,13 +117,13 @@ void MX_FREERTOS_Init(void) {
   osMessageQDef(LogQueue, 8, uint32_t);
   LogQueueHandle = osMessageCreate(osMessageQ(LogQueue), NULL);
 
-  /* definition and creation of UartLeft */
-  osMessageQDef(UartLeft, 128, uint8_t);
-  UartLeftHandle = osMessageCreate(osMessageQ(UartLeft), NULL);
+  /* definition and creation of UartLeftQueue */
+  osMessageQDef(UartLeftQueue, 128, uint8_t);
+  UartLeftQueueHandle = osMessageCreate(osMessageQ(UartLeftQueue), NULL);
 
-  /* definition and creation of UartRight */
-  osMessageQDef(UartRight, 128, uint8_t);
-  UartRightHandle = osMessageCreate(osMessageQ(UartRight), NULL);
+  /* definition and creation of UartRightQueue */
+  osMessageQDef(UartRightQueue, 128, uint8_t);
+  UartRightQueueHandle = osMessageCreate(osMessageQ(UartRightQueue), NULL);
 
   /* definition and creation of DispQueue */
   osMessageQDef(DispQueue, 128, uint8_t);
@@ -143,11 +143,11 @@ void MX_FREERTOS_Init(void) {
   LogTaskHandle = osThreadCreate(osThread(LogTask), NULL);
 
   /* definition and creation of UARTLeftTask */
-  osThreadDef(UARTLeftTask, StartUARTLeftTask, osPriorityLow, 0, 128);
+  osThreadDef(UARTLeftTask, StartUARTLeftTask, osPriorityAboveNormal, 0, 128);
   UARTLeftTaskHandle = osThreadCreate(osThread(UARTLeftTask), NULL);
 
   /* definition and creation of UARTRightTask */
-  osThreadDef(UARTRightTask, StartUARTRightTask, osPriorityLow, 0, 128);
+  osThreadDef(UARTRightTask, StartUARTRightTask, osPriorityAboveNormal, 0, 128);
   UARTRightTaskHandle = osThreadCreate(osThread(UARTRightTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -156,8 +156,8 @@ void MX_FREERTOS_Init(void) {
 
   get_set_log_queue_id(LogQueueHandle);
   get_set_dispatcher_queue_id(DispQueueHandle);
-  get_set_uart_left_queue_id(UartLeftHandle);
-  get_set_uart_right_queue_id(UartRightHandle);
+  get_set_uart_left_queue_id(UartLeftQueueHandle);
+  get_set_uart_right_queue_id(UartRightQueueHandle);
 
   get_set_mem_log_thread_id(LogTaskHandle);
   get_set_uart_left_thread_id(UARTLeftTaskHandle);
@@ -240,7 +240,7 @@ void StartUARTLeftTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	 queue_evt = osMessageGet(UartLeftHandle, osWaitForever);
+	 queue_evt = osMessageGet(UartLeftQueueHandle, osWaitForever);
 	 if (queue_evt.status == osEventMessage){
 		 result = bsp_transmit_uart_right((uint8_t)queue_evt.value.p);
 	  	  if (result == BSP_OK) {
@@ -273,7 +273,7 @@ void StartUARTRightTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  queue_evt = osMessageGet(UartRightHandle, osWaitForever);
+	  queue_evt = osMessageGet(UartRightQueueHandle, osWaitForever);
 	  if (queue_evt.status == osEventMessage){
 		  	  result = bsp_transmit_uart_left((uint8_t)queue_evt.value.p);
 		  	  if (result == BSP_OK) {

@@ -4,7 +4,7 @@
 ../Core/BSP/uart_bsp.c:45:10:bsp_transmit_uart_right	1
 ../Core/BSP/uart_bsp.c:58:6:HAL_UART_TxCpltCallback	4
 ../Core/BSP/uart_bsp.c:68:6:HAL_UART_RxCpltCallback	4
-../Core/BSP/uart_bsp.c:86:6:init_isr_uarts	1
-../Core/BSP/uart_bsp.c:92:6:start_isr_uart_disp	1
-../Core/BSP/uart_bsp.c:95:6:start_isr_uart_left	1
-../Core/BSP/uart_bsp.c:98:6:start_isr_uart_right	1
+../Core/BSP/uart_bsp.c:85:6:init_isr_uarts	1
+../Core/BSP/uart_bsp.c:91:6:start_isr_uart_disp	1
+../Core/BSP/uart_bsp.c:94:6:start_isr_uart_left	1
+../Core/BSP/uart_bsp.c:97:6:start_isr_uart_right	1
