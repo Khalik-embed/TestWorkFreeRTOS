@@ -1,0 +1,6 @@
+../Core/Src/freertos.c:85:6:vApplicationGetIdleTaskMemory	1
+../Core/Src/freertos.c:99:6:MX_FREERTOS_Init	1
+../Core/Src/freertos.c:179:6:StartDispacherTask	2
+../Core/Src/freertos.c:205:6:StartLogTask	3
+../Core/Src/freertos.c:231:6:StartUARTLeftTask	3
+../Core/Src/freertos.c:261:6:StartUARTRightTask	3
