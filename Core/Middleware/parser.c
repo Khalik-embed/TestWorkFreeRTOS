@@ -46,7 +46,7 @@ void command_parser(uint8_t data_byte){
 	status_assembly = assembly_str_until_end(data_byte);
 	//log_Queue_put(LOG_INFO, (uint8_t *)command_line);
 	if (status_assembly == COMMAND_READY) {
-		log_Queue_put(LOG_INFO, command_line);
+		//log_Queue_put(LOG_INFO, command_line);
 		if (strncmp(command_line, COMMAND_SEND_UART_LEFT, strlen(COMMAND_SEND_UART_LEFT)-1) == 0) {
 			log_Queue_put(LOG_INFO, (uint8_t *)"Get command left");
 			command = UART_LEFT_SEND;

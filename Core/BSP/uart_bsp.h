@@ -12,9 +12,9 @@
 
 #include "bsp.h"
 
-#define AMOUNT_OF_BYTES_FOR_ISR_UART_DISP_LOG 1
-#define AMOUNT_OF_BYTES_FOR_ISR_UART_UART_LEFT 1
-#define AMOUNT_OF_BYTES_FOR_ISR_UART_UART_RIGHT 1
+#define AMOUNT_OF_BYTES_FOR_ISR_UART_DISP_LOG (uint16_t)0x1
+#define AMOUNT_OF_BYTES_FOR_ISR_UART_LEFT (uint16_t)0x1
+#define AMOUNT_OF_BYTES_FOR_ISR_UART_RIGHT (uint16_t)0x1
 
 status_t bsp_print_log(log_message_t * message);
 status_t bsp_transmit_uart_right(uint8_t data_byte);

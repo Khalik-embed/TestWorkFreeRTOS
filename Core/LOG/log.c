@@ -47,12 +47,14 @@ uint32_t log_Queue_put(LogLevel_t log_level, const uint8_t * message){
 	if (log_level >= LOG_LEVEL) {
 		log_message_t    *message_item_ptr;
 		message_item_ptr = osPoolAlloc(get_set_log_pool_id(NULL));
-		uint32_t time_stamp =  bsp_get_time_stamp();
-		sprintf((char *)message_item_ptr->message, LOG_MESSAGE_TEMPLATE,
-	         (unsigned int)time_stamp,
-			 log_level_string[log_level], message);
-		message_item_ptr->size = strlen((char *)message_item_ptr->message);
-		result = (uint32_t)osMessagePut(get_set_log_queue_id(NULL), (uint32_t)message_item_ptr, osWaitForever);
+		if (message_item_ptr != NULL) {
+			uint32_t time_stamp =  bsp_get_time_stamp();
+			sprintf((char *)message_item_ptr->message, LOG_MESSAGE_TEMPLATE,
+					(unsigned int)time_stamp,
+			 	 log_level_string[log_level], message);
+			message_item_ptr->size = strlen((char *)message_item_ptr->message);
+			result = (uint32_t)osMessagePut(get_set_log_queue_id(NULL), (uint32_t)message_item_ptr, osWaitForever);
+		}
 	}
 	return result;
 }

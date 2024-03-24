@@ -10,11 +10,17 @@
 
 #include "cmsis_os.h"
 
-osThreadId get_set_mem_log_thread_id(osThreadId thread_id);
+
 osThreadId get_set_uart_left_queue_id(osThreadId thread_id);
 osThreadId get_set_uart_right_queue_id(osThreadId thread_id);
 osThreadId get_set_dispatcher_queue_id(osThreadId thread_id);
+
+osThreadId get_set_mem_log_thread_id(osThreadId thread_id);
+osThreadId get_set_uart_left_thread_id(osThreadId thread_id_new);
+osThreadId get_set_uart_right_thread_id(osThreadId thread_id_new);
+
 osPoolId  get_set_log_pool_id(osPoolId  pool_id_new);
 osMessageQId  get_set_log_queue_id(osMessageQId  queue_id_new);
+
 
 #endif /* MIDDLEWARE_SET_GET_H_ */

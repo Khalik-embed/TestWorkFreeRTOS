@@ -153,12 +153,15 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   LogMemHandle = osPoolCreate(osPool(LogMem));
   get_set_log_pool_id(LogMemHandle);
+
   get_set_log_queue_id(LogQueueHandle);
   get_set_dispatcher_queue_id(DispQueueHandle);
   get_set_uart_left_queue_id(UartLeftHandle);
   get_set_uart_right_queue_id(UartRightHandle);
 
   get_set_mem_log_thread_id(LogTaskHandle);
+  get_set_uart_left_thread_id(UARTLeftTaskHandle);
+  get_set_uart_right_thread_id(UARTRightTaskHandle);
 
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -185,11 +188,10 @@ void StartDispacherTask(void const * argument)
   for(;;)
   {
 	queue_evt = osMessageGet(DispQueueHandle, osWaitForever);
-	//start_isr_uart_disp();
 	if (queue_evt.status == osEventMessage){
 		command_parser((uint8_t)queue_evt.value.p);
 	}
-	osThreadYield();
+	//osThreadYield();
   }
   /* USER CODE END StartDispacherTask */
 }
@@ -232,14 +234,22 @@ void StartLogTask(void const * argument)
 void StartUARTLeftTask(void const * argument)
 {
   /* USER CODE BEGIN StartUARTLeftTask */
+	static uint8_t test_str[50];
+	status_t result;
 	osEvent  queue_evt;
   /* Infinite loop */
   for(;;)
   {
 	 queue_evt = osMessageGet(UartLeftHandle, osWaitForever);
 	 if (queue_evt.status == osEventMessage){
-		 bsp_transmit_uart_right((uint8_t)queue_evt.value.p);
-		 log_Queue_put(LOG_INFO, (uint8_t *)"GET DATA LEFT");
+		 result = bsp_transmit_uart_right((uint8_t)queue_evt.value.p);
+	  	  if (result == BSP_OK) {
+	  		sprintf(test_str, " OK GET DATA LEFT=%x", (uint32_t)queue_evt.value.p);
+	  	  }else {
+	  		sprintf(test_str, "FALL GET DATA LEFT=%x", (uint32_t)queue_evt.value.p);
+	  	  }
+
+	  	  log_Queue_put(LOG_INFO, test_str);
 	  }
 	 osSignalWait (UART_RIGHT_SIGNAL_TX, osWaitForever); // wait until send
 
@@ -258,15 +268,21 @@ void StartUARTRightTask(void const * argument)
 {
   /* USER CODE BEGIN StartUARTRightTask */
 	static uint8_t test_str[50];
+	status_t result;
 	osEvent  queue_evt;
   /* Infinite loop */
   for(;;)
   {
 	  queue_evt = osMessageGet(UartRightHandle, osWaitForever);
 	  if (queue_evt.status == osEventMessage){
-		  	  bsp_transmit_uart_left((uint8_t)queue_evt.value.p);
-		  	  //sprintf()
-		  	  log_Queue_put(LOG_INFO, (uint8_t *)"GET DATA RIGHT");
+		  	  result = bsp_transmit_uart_left((uint8_t)queue_evt.value.p);
+		  	  if (result == BSP_OK) {
+		  		sprintf(test_str, " OK GET DATA RIGHT=%x", (uint32_t)queue_evt.value.p);
+		  	  }else {
+		  		sprintf(test_str, "FALL GET DATA RIGHT=%x", (uint32_t)queue_evt.value.p);
+		  	  }
+
+		  	  log_Queue_put(LOG_INFO, test_str);
 		  }
 	  osSignalWait (UART_LEFT_SIGNAL_TX, osWaitForever); // wait until send
   }
