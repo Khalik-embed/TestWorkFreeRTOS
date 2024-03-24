@@ -1,3 +1,3 @@
-../Core/Middleware/parser.c:15:19:assembly_str_until_end	6
-../Core/Middleware/parser.c:34:6:read_until_end	2
-../Core/Middleware/parser.c:42:6:command_parser	6
+../Core/Middleware/parser.c:16:19:assembly_str_until_end	6
+../Core/Middleware/parser.c:35:6:read_until_end	2
+../Core/Middleware/parser.c:43:6:command_parser	6

@@ -29,6 +29,8 @@ typedef enum {
 #define UART_RIGHT_SIGNAL_TX 0x00010000
 #define UART_RIGHT_SIGNAL_RX 0x00100000
 
+#define MAX_TIME_WAIT_QUEUE_FROM_ISR 0x0f
+
 typedef struct {
     int size;
     uint8_t message[MAX_LOG_INFO_WIDTH];

@@ -5,17 +5,14 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../Core/BSP/bsp.c \
 ../Core/BSP/time_bsp.c \
 ../Core/BSP/uart_bsp.c 
 
 OBJS += \
-./Core/BSP/bsp.o \
 ./Core/BSP/time_bsp.o \
 ./Core/BSP/uart_bsp.o 
 
 C_DEPS += \
-./Core/BSP/bsp.d \
 ./Core/BSP/time_bsp.d \
 ./Core/BSP/uart_bsp.d 
 
@@ -27,7 +24,7 @@ Core/BSP/%.o Core/BSP/%.su Core/BSP/%.cyclo: ../Core/BSP/%.c Core/BSP/subdir.mk
 clean: clean-Core-2f-BSP
 
 clean-Core-2f-BSP:
-	-$(RM) ./Core/BSP/bsp.cyclo ./Core/BSP/bsp.d ./Core/BSP/bsp.o ./Core/BSP/bsp.su ./Core/BSP/time_bsp.cyclo ./Core/BSP/time_bsp.d ./Core/BSP/time_bsp.o ./Core/BSP/time_bsp.su ./Core/BSP/uart_bsp.cyclo ./Core/BSP/uart_bsp.d ./Core/BSP/uart_bsp.o ./Core/BSP/uart_bsp.su
+	-$(RM) ./Core/BSP/time_bsp.cyclo ./Core/BSP/time_bsp.d ./Core/BSP/time_bsp.o ./Core/BSP/time_bsp.su ./Core/BSP/uart_bsp.cyclo ./Core/BSP/uart_bsp.d ./Core/BSP/uart_bsp.o ./Core/BSP/uart_bsp.su
 
 .PHONY: clean-Core-2f-BSP
 

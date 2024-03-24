@@ -25,6 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
 #include "parser.h"
 #include "set_get.h"
 #include "log.h"
@@ -180,19 +181,17 @@ void StartDispacherTask(void const * argument)
   /* USER CODE BEGIN StartDispacherTask */
 	osEvent  queue_evt;
 	init_isr_uarts();
-	log_Queue_put(LOG_INFO, (uint8_t *)" ");
+	//log_Queue_put(LOG_INFO, (uint8_t *)" ");
 	log_Queue_put(LOG_INFO, (uint8_t *)"Start work, you can send:");
 	log_Queue_put(LOG_INFO, (uint8_t *)"LEFT SEND:\"SOME_DATA\"");
 	log_Queue_put(LOG_INFO, (uint8_t *)"RIGHT SEND:\"SOME_DATA\"");
   /* Infinite loop */
-  for(;;)
-  {
-	queue_evt = osMessageGet(DispQueueHandle, osWaitForever);
-	if (queue_evt.status == osEventMessage){
-		command_parser((uint8_t)queue_evt.value.p);
+	for(;;) {
+		queue_evt = osMessageGet(DispQueueHandle, osWaitForever);
+		if (queue_evt.status == osEventMessage){
+			command_parser((uint8_t)queue_evt.value.p);
+		}
 	}
-	//osThreadYield();
-  }
   /* USER CODE END StartDispacherTask */
 }
 
@@ -208,19 +207,17 @@ void StartLogTask(void const * argument)
   /* USER CODE BEGIN StartLogTask */
 	osEvent  queue_evt;
 	osEvent  signal_evt;
-
   /* Infinite loop */
-  for(;;)
-  {
-	  queue_evt = osMessageGet(LogQueueHandle, osWaitForever);
-    if (queue_evt.status == osEventMessage) {
-    	log_print_from_Queue(queue_evt.value.p);
-    }
-    signal_evt = osSignalWait (LOG_SIGNAL_TX, osWaitForever);
-    if(signal_evt.status == osEventSignal){
-    	osPoolFree(LogMemHandle, queue_evt.value.p);
-    }
-  }
+	for(;;) {
+		queue_evt = osMessageGet(LogQueueHandle, osWaitForever);
+		if (queue_evt.status == osEventMessage) {
+			log_print_from_Queue(queue_evt.value.p);
+		}
+		signal_evt = osSignalWait (LOG_SIGNAL_TX, osWaitForever);
+		if(signal_evt.status == osEventSignal) {
+			osPoolFree(LogMemHandle, queue_evt.value.p);
+		}
+	}
   /* USER CODE END StartLogTask */
 }
 
@@ -238,21 +235,18 @@ void StartUARTLeftTask(void const * argument)
 	status_t result;
 	osEvent  queue_evt;
   /* Infinite loop */
-  for(;;)
-  {
-	 queue_evt = osMessageGet(UartLeftQueueHandle, osWaitForever);
-	 if (queue_evt.status == osEventMessage){
-		 result = bsp_transmit_uart_right((uint8_t)queue_evt.value.p);
-	  	  if (result == BSP_OK) {
-	  		sprintf(test_str, " OK GET DATA LEFT=%x", (uint32_t)queue_evt.value.p);
-	  	  }else {
-	  		sprintf(test_str, "FALL GET DATA LEFT=%x", (uint32_t)queue_evt.value.p);
-	  	  }
-
-	  	  log_Queue_put(LOG_INFO, test_str);
-	  }
-	 osSignalWait (UART_RIGHT_SIGNAL_TX, osWaitForever); // wait until send
-
+	for(;;) {
+		queue_evt = osMessageGet(UartLeftQueueHandle, osWaitForever);
+		if (queue_evt.status == osEventMessage) {
+			result = bsp_transmit_uart_right((uint8_t)queue_evt.value.p);
+			if (result == BSP_OK) {
+				sprintf((char *)test_str, "OK GET DATA LEFT=%x", (uint8_t)queue_evt.value.p);
+			} else {
+				sprintf((char *)test_str, "FALL GET DATA LEFT=%x", (uint8_t)queue_evt.value.p);
+			}
+		log_Queue_put(LOG_INFO, test_str);
+	}
+	osSignalWait(UART_RIGHT_SIGNAL_TX, osWaitForever); // wait until send
   }
   /* USER CODE END StartUARTLeftTask */
 }
@@ -271,21 +265,19 @@ void StartUARTRightTask(void const * argument)
 	status_t result;
 	osEvent  queue_evt;
   /* Infinite loop */
-  for(;;)
-  {
-	  queue_evt = osMessageGet(UartRightQueueHandle, osWaitForever);
-	  if (queue_evt.status == osEventMessage){
-		  	  result = bsp_transmit_uart_left((uint8_t)queue_evt.value.p);
-		  	  if (result == BSP_OK) {
-		  		sprintf(test_str, " OK GET DATA RIGHT=%x", (uint32_t)queue_evt.value.p);
-		  	  }else {
-		  		sprintf(test_str, "FALL GET DATA RIGHT=%x", (uint32_t)queue_evt.value.p);
-		  	  }
-
-		  	  log_Queue_put(LOG_INFO, test_str);
+	for(;;) {
+		queue_evt = osMessageGet(UartRightQueueHandle, osWaitForever);
+		if (queue_evt.status == osEventMessage) {
+			result = bsp_transmit_uart_left((uint8_t)queue_evt.value.p);
+		  	if (result == BSP_OK) {
+		  		sprintf((char *)test_str, "OK GET DATA RIGHT=%x", (uint8_t)queue_evt.value.p);
+		  	} else {
+		  		sprintf((char *)test_str, "FALL GET DATA RIGHT=%x", (uint8_t)queue_evt.value.p);
+		  	}
+		  	log_Queue_put(LOG_INFO, test_str);
 		  }
-	  osSignalWait (UART_LEFT_SIGNAL_TX, osWaitForever); // wait until send
-  }
+		osSignalWait (UART_LEFT_SIGNAL_TX, osWaitForever); // wait until send
+	}
   /* USER CODE END StartUARTRightTask */
 }
 

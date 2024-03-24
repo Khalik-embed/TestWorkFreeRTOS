@@ -1,4 +1,3 @@
-"./Core/BSP/bsp.o"
 "./Core/BSP/time_bsp.o"
 "./Core/BSP/uart_bsp.o"
 "./Core/LOG/log.o"

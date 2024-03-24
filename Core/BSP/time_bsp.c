@@ -9,7 +9,6 @@
 
 #include "time_bsp.h"
 
-uint32_t bsp_get_time_stamp(void){
+uint32_t bsp_get_time_stamp(void) {
 	return HAL_GetTick();
 }
-;
